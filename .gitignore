@@ -1,0 +1,29 @@
+# Binaries
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Dependencies
+node_modules/
+vendor/
+
+# Datasets and Media
+datasets/inbox/*
+!datasets/inbox/.gitkeep
+datasets/curated/*
+!datasets/curated/.gitkeep
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.pt
+*.engine
+*.onnx
+
+# Environment & IDE
+.env
+.DS_Store
+.vscode/
+.idea/
