@@ -54,9 +54,10 @@ O frontend adota uma estética visual futurista de alta densidade inspirada no u
   - Verde Esmeralda: `#00ff9d` (Status Online, Sucesso & Aprovação de Labels)
 - **Tipografia Modular:** Google Fonts (`Advent Pro`, `Barlow`, `Tomorrow`, `Oxanium` e `JetBrains Mono`).
 
-### ⚠️ Regra Estrita de Modularização Frontend:
-- **Limite Máximo de 100 Linhas por Arquivo:** Nenhum arquivo CSS, JS ou JSX em `web/` pode ultrapassar **100 linhas**.
-- Se um componente crescer além de 100 linhas, ele **deve** ser dividido em sub-módulos focados (ex: `LabelCanvas.jsx`, `ClassSelector.jsx`, `DeduplicationCard.jsx`).
+### ⚠️ Regras Estritas de Frontend & Cyberpunk Design System:
+- **Limite Máximo de 100 Linhas por Arquivo:** Nenhum arquivo CSS, JS ou JSX em `web/` pode ultrapassar **100 linhas**. Se crescer, deve ser modularizado.
+- **Proibição Absoluta de Emojis em Listas e Dropdowns:** Nunca usar emojis (como ⚡, 🎥, 📁, ⭐, 🏆, etc.) dentro de `<select>`, `<option>`, dropdowns, tabelas ou listas em nenhum projeto.
+- **Linguagem Técnica Militar Cyberpunk:** Listas e opções devem usar terminologia técnica HUD (ex: `[TRAINED] YOLO26M // mAP 58.1%`, `[STREAM] CAM_01 // 1080P @ 30 FPS`, `[OK]`, `// RETICLE`). Ícones visuais devem remeter puramente à estética Cyberpunk HUD e nunca serem embutidos dentro de itens de listagem.
 
 ---
 
