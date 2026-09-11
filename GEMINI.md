@@ -1,10 +1,16 @@
 # HydraVault Project Guidelines (GEMINI.md)
 
-Este documento define a arquitetura, design system cyberpunk, catálogo de skills, pipelines de curadoria/active learning e protocolo de auto-reparo do ecossistema **HydraVault** (Cofre de Dados de Visão Computacional, Auto-Rotulagem & Curadoria para YOLO).
+Este documento define a arquitetura, design system cyberpunk, catálogo de skills, pipelines de curadoria/active learning e protocolo de auto-reparo do **HydraVault** (Cofre de Dados de Visão Computacional, Auto-Rotulagem SAM 2 e Curadoria para os modelos do Marketplace Hydra).
 
 ---
 
-## 1. Filosofia de Engenharia e Estrutura Arquitetural
+## 0. Papel no Ecossistema & Cadeia de Valor de IA
+
+O **HydraVault** é o **Cofre de Curadoria de Dados** do ecossistema:
+1. **Ingestão Active Learning:** Recebe frames de baixa confiança enviados em produção pelo **HydraStream**.
+2. **Auto-Rotulagem & Curadoria com SAM 2:** Permite anotação zero-shot e aprovação de instâncias com alta precisão.
+3. **Exportação Versionada:** Fornece datasets `data.yaml` perfeitamente balanceados para o **HydraForge** treinar novos modelos analíticos do Marketplace.
+
 
 O projeto segue estritamente a **Arquitetura Hexagonal (Ports & Adapters)** combinada com **Domain-Driven Design (DDD)**:
 
