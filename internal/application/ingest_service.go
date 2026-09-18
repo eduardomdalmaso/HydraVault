@@ -53,9 +53,17 @@ func NewIngestService(
 
 // IngestFrame ingests an image, computes pHash, checks deduplication and persists it.
 func (s *IngestService) IngestFrame(ctx context.Context, cmd IngestCommand) (*domain.Frame, error) {
-	// Verify dataset exists
+	// Verify dataset exists or auto-create dynamic dataset
 	if _, err := s.datasetRepo.GetByID(ctx, cmd.DatasetID); err != nil {
-		return nil, fmt.Errorf("dataset error: %w", err)
+		_ = s.datasetRepo.Save(ctx, &domain.Dataset{
+			DatasetID:   cmd.DatasetID,
+			Name:        fmt.Sprintf("Dataset %s", cmd.DatasetID),
+			Description: "Dataset auto-criado pela esteira de ingestão do HydraVault.",
+			Task:        domain.TaskDetect,
+			Classes: []domain.ClassMetadata{
+				{ID: 0, Name: "object"},
+			},
+		})
 	}
 
 	// Buffer image bytes for decoding and storage

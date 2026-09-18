@@ -59,7 +59,15 @@ func (h *InboxHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 	var bboxes []domain.BBox
 	bboxesJSON := r.FormValue("bboxes")
 	if bboxesJSON != "" {
-		_ = json.Unmarshal([]byte(bboxesJSON), &bboxes)
+		var rawList []map[string]any
+		if err := json.Unmarshal([]byte(bboxesJSON), &rawList); err == nil {
+			for _, item := range rawList {
+				bbox := parseFlexibleBBox(item)
+				if err := bbox.Validate(); err == nil {
+					bboxes = append(bboxes, bbox)
+				}
+			}
+		}
 	}
 
 	frame, err := h.ingestService.IngestFrame(r.Context(), application.IngestCommand{
@@ -84,4 +92,69 @@ func (h *InboxHandler) HandleUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusCreated, frame)
+}
+
+func parseFlexibleBBox(m map[string]any) domain.BBox {
+	var bbox domain.BBox
+
+	if id, ok := m["class_id"].(float64); ok {
+		bbox.ClassID = int(id)
+	}
+	if name, ok := m["class_name"].(string); ok {
+		bbox.ClassName = strings.ToLower(strings.TrimSpace(name))
+	} else if lbl, ok := m["label"].(string); ok {
+		bbox.ClassName = strings.ToLower(strings.TrimSpace(lbl))
+	}
+
+	if conf, ok := m["confidence"].(float64); ok {
+		bbox.Confidence = conf
+	}
+
+	// 1. Direct x_center, y_center, width, height
+	if xc, ok := m["x_center"].(float64); ok {
+		bbox.XCenter = xc
+		if yc, ok := m["y_center"].(float64); ok {
+			bbox.YCenter = yc
+		}
+		if w, ok := m["width"].(float64); ok {
+			bbox.Width = w
+		}
+		if h, ok := m["height"].(float64); ok {
+			bbox.Height = h
+		}
+	} else if rawBox, ok := m["box"].([]any); ok && len(rawBox) >= 4 {
+		// [x, y, w, h] format
+		x, _ := rawBox[0].(float64)
+		y, _ := rawBox[1].(float64)
+		w, _ := rawBox[2].(float64)
+		h, _ := rawBox[3].(float64)
+
+		// Convert from 0-100 percentage to 0.0-1.0 if needed
+		if x > 1.0 || y > 1.0 || w > 1.0 || h > 1.0 {
+			x /= 100.0
+			y /= 100.0
+			w /= 100.0
+			h /= 100.0
+		}
+		bbox.XCenter = x + (w / 2.0)
+		bbox.YCenter = y + (h / 2.0)
+		bbox.Width = w
+		bbox.Height = h
+	}
+
+	// Clamp boundaries safely
+	if bbox.Width <= 0.0 {
+		bbox.Width = 0.1
+	}
+	if bbox.Height <= 0.0 {
+		bbox.Height = 0.1
+	}
+	if bbox.XCenter <= 0.0 {
+		bbox.XCenter = bbox.Width / 2.0
+	}
+	if bbox.YCenter <= 0.0 {
+		bbox.YCenter = bbox.Height / 2.0
+	}
+
+	return bbox
 }

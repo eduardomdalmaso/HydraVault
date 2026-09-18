@@ -29,8 +29,22 @@ func NewRouter(
 	mux.HandleFunc("/api/v1/datasets/", datasetHandler.HandleDatasetItem)
 	mux.HandleFunc("/api/v1/inbox/upload", inboxHandler.HandleUpload)
 
-	// Wrap mux with AuthMiddleware and Security Headers
-	return authMiddleware.Wrap(securityHeaders(mux))
+	// Wrap mux with AuthMiddleware, Security Headers and CORS
+	return WithCORS(authMiddleware.Wrap(securityHeaders(mux)))
+}
+
+// WithCORS sets Cross-Origin Resource Sharing headers and handles OPTIONS preflights.
+func WithCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-API-Key")
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func securityHeaders(next http.Handler) http.Handler {
