@@ -27,3 +27,10 @@ datasets/curated/*
 .DS_Store
 .vscode/
 .idea/
+
+# Database & SQLite
+*.db
+*.db-shm
+*.db-wal
+storage/*.db*
+
